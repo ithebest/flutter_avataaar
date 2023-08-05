@@ -63,7 +63,7 @@ class _AvataaarExampleState extends State<AvataaarExample> {
                         return ElevatedButton(
                           onPressed: () async {
                             try {
-                              final file = await _avatar.getPngFromSvg();
+                              final file = await _avatar.getPngFromSvg(context);
                               ScaffoldMessenger.of(_).showSnackBar(
                                 SnackBar(
                                   content: Text(file.path),

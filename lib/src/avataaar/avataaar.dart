@@ -97,8 +97,10 @@ class Avataaar implements AvataaarPart {
   String toJson() => json.encode(toMap());
 
   ///Entries, which are necesary to generate the url
-  Iterable<MapEntry<String, String>> get _pieceEntries =>
-      pieces.expand((it) => it.pieces).where((it) => it != null).map(_splitEnum);
+  Iterable<MapEntry<String, String>> get _pieceEntries => pieces
+      .expand((it) => it.pieces)
+      .where((it) => it != null)
+      .map(_splitEnum);
 
   ///Split the enum in two parts to use the first one as the key of the parameter on the URL and the second as the value.
   MapEntry<String, String> _splitEnum<T>(T enumValue) {
@@ -126,7 +128,8 @@ class Avataaar implements AvataaarPart {
   /// if background color is set, it will be on the file.
   ///
   /// Throw an [Exception] if it fails
-  Future<File> getPngFromSvg({
+  Future<File> getPngFromSvg(
+    BuildContext context, {
     String? path,
     String? fileName,
     double? width,
@@ -160,23 +163,27 @@ class Avataaar implements AvataaarPart {
       }
 
       if (backgroundColor != AvataaarsApi.baseBackgroundColor) {
-        svgString = BackgroundColorHelper.getSvgWithBackground(svgString, backgroundColor);
+        svgString = BackgroundColorHelper.getSvgWithBackground(
+            svgString, backgroundColor);
       }
 
       var unit8Picture = Uint8List.fromList(svgString.codeUnits);
       //Produces a [Drawableroot] from a [Uint8List] of SVG byte data (assumes UTF8 encoding).
-      var svgDrawableRoot = await svg.fromSvgBytes(unit8Picture, 'svgToPngAvataaar');
+      var pictureInfo =
+          await vg.loadPicture(SvgBytesLoader(unit8Picture), context);
 
-      // Convert to ui.Picture
-      var picture = svgDrawableRoot.toPicture(size: Size(finalWidth, finalHeight));
+      // // Convert to ui.Picture
+      // var picture = svgDrawableRoot.toPicture(size: Size(finalWidth, finalHeight));
       // Convert to ui.Image. toImage() takes width and height as parameters
       // you need to find the best size to suit your needs and take into account the screen DPI
-      var image = await picture.toImage(finalWidth.toInt(), finalHeight.toInt());
+      var image = await pictureInfo.picture
+          .toImage(finalWidth.toInt(), finalHeight.toInt());
       var bytes = await image.toByteData(format: ImageByteFormat.png);
 
       //Saving as a temporary file using a unique string
 
-      var file = File('${path ?? (await getTemporaryDirectory()).path}/${fileName ?? Uuid().v4()}.png');
+      var file = File(
+          '${path ?? (await getTemporaryDirectory()).path}/${fileName ?? Uuid().v4()}.png');
       if (await file.exists()) {
         if (overrideFile) {
           await file.delete();
@@ -201,7 +208,8 @@ class Avataaar implements AvataaarPart {
   static final Map<String, String> cachedUrls = {};
 
   ///Decode from json
-  static Avataaar fromJson(String value) => Avataaar.fromMap(json.decode(value));
+  static Avataaar fromJson(String value) =>
+      Avataaar.fromMap(json.decode(value));
 
   ///Transform from map to [Avataaar]
   factory Avataaar.fromMap(Map<String, dynamic> map) => Avataaar(
@@ -224,6 +232,7 @@ class Avataaar implements AvataaarPart {
         'Skin': skin.toMap(),
         'Style': style.toMap(),
       };
+
   Avataaar copyWith({
     Top? top,
     Clothes? clothes,

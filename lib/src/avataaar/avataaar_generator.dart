@@ -12,14 +12,14 @@ class AvataaarGenerator extends StatelessWidget {
   final List<Color> colors;
 
   AvataaarGenerator({
-    Key? key,
+    super.key,
     required this.avataaar,
     required this.onTranslateKey,
     this.onUpdateAvataaar,
     this.avataaarPicture,
     this.onError,
     this.colors = Avataaar.defaultBackgroundColors,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
